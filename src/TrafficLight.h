@@ -6,6 +6,9 @@
 #include <condition_variable>
 #include "TrafficObject.h"
 
+enum TrafficLightPhase {red, green}; // FP1 TrafficLightPhase is an enum that 
+// can be either „red“ or „green“
+
 // forward declarations to avoid include cycle
 class Vehicle;
 
@@ -30,17 +33,25 @@ private:
 // can be either „red“ or „green“. Also, add the private method „void cycleThroughPhases()“. 
 // Furthermore, there shall be the private member _currentPhase which can take „red“ or „green“ as its value. 
 
-class TrafficLight
+class TrafficLight : public TrafficObject // FP.1 (..child class of TrafficObject..)
 {
 public:
     // constructor / desctructor
+    TrafficLight(); //FP.1
+    ~TrafficLight(); //FP.1
 
     // getters / setters
+    TrafficLightPhase getCurrentPhase(); //FP.1
 
     // typical behaviour methods
+    void waitForGreen(); //FP.1
+    void simulate(); //FP.1
+
 
 private:
     // typical behaviour methods
+    void cycleTroughPhases(TrafficLightPhase); //FP.1
+    TrafficLightPhase _currentPhase; //FP.1
 
     // FP.4b : create a private member of type MessageQueue for messages of type TrafficLightPhase 
     // and use it within the infinite loop to push each new TrafficLightPhase into it by calling 
