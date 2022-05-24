@@ -2,6 +2,10 @@
 #include <random>
 #include "TrafficLight.h"
 
+#include <stdio.h>      /* NULL */
+#include <stdlib.h>     /* srand, rand */
+#include <time.h>       /* time */
+
 /* Implementation of class "MessageQueue" */
 
 /* 
@@ -36,7 +40,7 @@ void TrafficLight::waitForGreen()
     // Once it receives TrafficLightPhase::green, the method returns.
 }
 
-TrafficLightPhase TrafficLight::getCurrentPhase() // FP1
+TrafficLightPhase TrafficLight::getCurrentPhase()
 {
     return _currentPhase;
 }
@@ -45,6 +49,7 @@ void TrafficLight::simulate()
 {
     // FP.2b : Finally, the private method „cycleThroughPhases“ should be started in a thread when the public method „simulate“ is called. To do this, use the thread queue in the base class. 
 }
+*/
 
 // virtual function which is executed in a thread
 void TrafficLight::cycleThroughPhases()
@@ -53,6 +58,41 @@ void TrafficLight::cycleThroughPhases()
     // and toggles the current phase of the traffic light between red and green and sends an update method 
     // to the message queue using move semantics. The cycle duration should be a random value between 4 and 6 seconds. 
     // Also, the while-loop should use std::this_thread::sleep_for to wait 1ms between two cycles. 
+    
+    // similar implementation in Vehicle::drive() (-> I reuse what makes sense)
+    int randCycleDuration = rand()%(6000-4000 + 1) + 4000;
+    std::chrono::time_point<std::chrono::system_clock> lastUpdate;
+
+    // Init stop watch
+    lastUpdate = std::chrono::system_clock::now();
+    // infinite loop
+    while(true)
+    {
+        // sleep at every iteration to reduce CPU usage
+        std::this_thread::sleep_for(std::chrono::milliseconds(1));
+
+        // compute time difference to stop watch
+        long timeSinceLastUpdate = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now() - lastUpdate).count();
+        if (timeSinceLastUpdate >= randCycleDuration)
+        {
+            // reset the clycle duration here to have a new time at each iteration
+            randCycleDuration = rand()%(6000-4000 + 1) + 4000;
+
+            if (_currentPhase == red)
+            {
+                _currentPhase = green;
+            }
+            else{
+                _currentPhase = red;
+            }
+            // send update to the message queue using move semantics
+            _msg.send(std::move(_currentPhase));
+
+            // reset stop watch for next cycle
+            lastUpdate = std::chrono::system_clock::now();
+        }
+
+    }
+
 }
 
-*/
