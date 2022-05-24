@@ -43,7 +43,7 @@ class TrafficLight : public TrafficObject // FP.1 (..child class of TrafficObjec
 public:
     // constructor / desctructor
     TrafficLight(); //FP.1
-    ~TrafficLight(); //FP.1
+    //~TrafficLight(); //FP.1
 
     // getters / setters
     TrafficLightPhase getCurrentPhase(); //FP.1
