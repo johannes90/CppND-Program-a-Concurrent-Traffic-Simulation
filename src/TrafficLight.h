@@ -22,8 +22,13 @@ template <class T>
 class MessageQueue
 {
 public:
+    void send(T&& message); //FP.3 (but had to implement that allready in FP.2 -> what is going on with the order of tasks?)
+    T receive(); //FP.3
 
 private:
+std::deque<T> _queue;
+std::condition_variable _condition;
+std::mutex _mutex;  
     
 };
 
@@ -50,7 +55,7 @@ public:
 
 private:
     // typical behaviour methods
-    void TrafficLight::cycleThroughPhases();    
+    void cycleThroughPhases();    
     TrafficLightPhase _currentPhase; //FP.1
 
     // FP.4b : create a private member of type MessageQueue for messages of type TrafficLightPhase 
@@ -58,8 +63,7 @@ private:
     // send in conjunction with move semantics.
     MessageQueue<TrafficLightPhase> _messages; //FP.4b
 
-    std::condition_variable _condition;
-    std::mutex _mutex;
+   
 };
 
 #endif
