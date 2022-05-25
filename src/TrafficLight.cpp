@@ -16,6 +16,8 @@ T MessageQueue<T>::receive()
     // to wait for and receive new messages and pull them from the queue using move semantics. 
     // The received object should then be returned by the receive function. 
     std::unique_lock<std::mutex> lock(_mutex);
+    // Do not wait without a condition: it is good for detecting the sporadic wake-up,
+    // https://www.modernescpp.com/index.php/c-core-guidelines-be-aware-of-the-traps-of-condition-variables
     _condition.wait(lock, [this] { return !_queue.empty(); });
     T message = std::move(_queue.front());
     _queue.pop_front();
@@ -24,12 +26,15 @@ T MessageQueue<T>::receive()
 
 
 template <typename T>
+// logically unnecessary copying and to provide perfect forwarding functions.
+// It is just a matter of performance as with move you avoid copying
 void MessageQueue<T>::send(T &&message)// (had to be implemented in FP.2 allready)
 {
     // FP.4a : The method send should use the mechanisms std::lock_guard<std::mutex> 
     // as well as _condition.notify_one() to add a new message to the queue and afterwards send a notification.
     std::lock_guard<std::mutex> lock(_mutex); 
-    _queue.push_back(std::move(message));
+    _queue.clear(); // make the performance better
+    _queue.emplace_back(std::move(message));
     _condition.notify_one();
 }
 
